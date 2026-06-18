@@ -641,65 +641,22 @@ Contexto do aluno:
 REGRA PRINCIPAL:
 A disciplina escolhida manda no conteúdo. Não misture matérias.
 
-PADRÃO OBRIGATÓRIO DA IDECAN PARA ESTA PROVA:
+PADRÃO OBRIGATÓRIO:
 - Use apenas alternativas A, B, C e D.
 - Não use alternativa E.
-- Crie questões objetivas, com linguagem de concurso.
-- Evite questões óbvias.
-- Use pegadinhas moderadas.
-- Use uma única alternativa correta.
+- Crie questões no estilo IDECAN.
+- Não faça perguntas óbvias.
 - Não faça perguntas de opinião.
-- Não fuja da disciplina escolhida.
+- Não revele o gabarito agora.
+- Não coloque comentários agora.
+- Não diga qual alternativa está correta agora.
 
-SE A DISCIPLINA FOR RACIOCÍNIO LÓGICO:
-Crie questões de:
-- equivalência lógica;
-- negação de proposições;
-- conectivos lógicos;
-- tabela-verdade;
-- conjuntos;
-- relação entre conjuntos;
-- problemas lógicos;
-- sequências;
-- razão, proporção ou porcentagem simples.
-
-Não crie questões sobre conduta de guarda, trânsito, abuso de autoridade, direitos humanos ou legislação.
-
-SE A DISCIPLINA FOR PORTUGUÊS:
-Crie questões no estilo IDECAN sobre:
-- interpretação de texto;
-- inferência;
-- acentuação;
-- função das palavras no texto;
-- conjunções;
-- dêixis;
-- linguagem denotativa/conotativa;
-- artigos;
-- regência;
-- vírgula;
-- homônimos;
-- verbo haver;
-- correção gramatical.
-
-SE A DISCIPLINA FOR HISTÓRIA DE CAMPINA GRANDE:
-Use questões sobre:
-- formação administrativa;
-- Vila Nova da Rainha;
-- emancipação;
-- distritos;
-- Quebra-quilos;
-- fatos históricos locais.
-
-SE A DISCIPLINA FOR LEGISLAÇÃO OU CONHECIMENTOS ESPECÍFICOS:
-Use o padrão IDECAN:
-- analise as afirmativas I, II e III;
-- assinale a alternativa incorreta;
-- assinale a alternativa correta;
-- preencha lacunas;
-- cobre lei seca;
-- cobre competências, requisitos, princípios, prazos, conceitos e exceções.
+IMPORTANTE:
+Este é um simulado para o aluno responder.
+Portanto, entregue SOMENTE as questões.
 
 Formato obrigatório:
+
 Questão 1
 [enunciado]
 
@@ -708,26 +665,28 @@ B) ...
 C) ...
 D) ...
 
-No final, coloque:
-1. Gabarito separado no formato:
-1-A
-2-C
-3-D
+Questão 2
+[enunciado]
 
-2. Comentários curtos, explicando por que a alternativa correta está certa.
+A) ...
+B) ...
+C) ...
+D) ...
 
-3. Nível de dificuldade.
+No final, escreva apenas:
+"Responda no formato 1-A, 2-B, 3-C... que eu corrijo para você."
 
-4. Assuntos que devo revisar.
+Se a disciplina for Raciocínio Lógico:
+- crie lógica pura;
+- use equivalência lógica, negação, conectivos, tabela-verdade, conjuntos, sequências, porcentagem, razão ou proporção;
+- não misture legislação, trânsito, abuso de autoridade ou conduta de guarda.
 
-Antes de responder, revise internamente:
+Antes de responder, revise:
 - todas as questões pertencem à disciplina ${disciplinaSimulado.value}?
 - há somente alternativas A, B, C e D?
 - existe apenas uma correta?
-- o estilo parece IDECAN?
-- alguma questão ficou fácil demais ou genérica demais?
-
-Se alguma questão estiver ruim, reescreva antes de entregar.`
+- o gabarito NÃO apareceu na resposta?
+- o estilo parece IDECAN?`
   );
 }
 
@@ -735,18 +694,48 @@ function corrigirRespostas() {
   if (!respostasAluno.value.trim()) return;
 
   enviarMensagem(
-    `Modo Correção: corrija minhas respostas do simulado anterior.
+    `Modo Correção de Simulado IDECAN.
+
+Corrija minhas respostas com base no ÚLTIMO SIMULADO gerado nesta sessão.
 
 Minhas respostas:
 ${respostasAluno.value}
 
 Tarefas:
-- diga quantas acertei;
-- dê minha nota;
-- mostre o gabarito;
-- explique meus erros;
-- diga o que devo revisar agora;
-- considere a banca ${perfil.value?.banca} e o cargo ${perfil.value?.cargo}.`
+1. Identifique o último simulado nesta conversa.
+2. Resolva novamente as questões para montar o gabarito correto.
+3. Compare com minhas respostas.
+4. Mostre quantas acertei e quantas errei.
+5. Dê uma nota aproximada.
+6. Mostre o gabarito completo somente agora.
+7. Explique cada erro de forma curta e objetiva.
+8. Informe os assuntos que devo revisar.
+
+Formato da resposta:
+
+Resultado:
+- Acertos:
+- Erros:
+- Nota:
+
+Gabarito:
+1-A
+2-B
+3-C
+
+Correção:
+Questão 1:
+- Minha resposta:
+- Gabarito:
+- Comentário:
+
+Assuntos para revisar:
+- ...
+
+Contexto:
+- banca: ${perfil.value?.banca};
+- cargo: ${perfil.value?.cargo};
+- concurso: ${perfil.value?.concurso}.`
   );
 
   respostasAluno.value = "";
