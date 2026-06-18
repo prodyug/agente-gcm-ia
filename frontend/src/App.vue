@@ -2734,4 +2734,168 @@ textarea:focus {
     min-height: 340px;
   }
 }
+/* ===== MELHORIAS MOBILE ===== */
+
+@media (max-width: 720px) {
+  body {
+    background: var(--bg);
+  }
+
+  .app {
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    padding: 12px;
+  }
+
+  .brand {
+    padding-bottom: 12px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+
+  .brand h1 {
+    font-size: 17px;
+  }
+
+  .brand p {
+    font-size: 11px;
+  }
+
+  .new-chat {
+    min-height: 40px;
+    margin: 12px 0;
+  }
+
+  .profile-card {
+    padding: 12px;
+  }
+
+  .sessions {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .sidebar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .topbar {
+    min-height: auto;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .topbar h2 {
+    font-size: 22px;
+  }
+
+  .topbar p {
+    font-size: 13px;
+  }
+
+  .tools-row {
+    padding-bottom: 4px;
+  }
+
+  .tools-row button {
+    min-height: 36px;
+    padding: 0 13px;
+    font-size: 13px;
+  }
+
+  .chat-panel {
+    min-height: 560px;
+    border-radius: 18px;
+  }
+
+  .chat-area {
+    padding: 20px 14px 14px;
+  }
+
+  .welcome-card {
+    margin: 12px auto;
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .welcome-card h3 {
+    font-size: 30px;
+  }
+
+  .welcome-card p {
+    font-size: 14px;
+  }
+
+  .message {
+    margin-bottom: 20px;
+  }
+
+  .message.assistant .markdown {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .message.user .markdown {
+    max-width: 92%;
+    font-size: 14.5px;
+  }
+
+  .quick-badges {
+    padding: 8px 10px 0;
+  }
+
+  .quick-badges button {
+    min-height: 32px;
+    font-size: 12px;
+  }
+
+  .composer {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .composer textarea {
+    min-height: 54px;
+    border-radius: 16px;
+  }
+
+  .composer button,
+  .mic-btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .tool-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .tool-title h3 {
+    font-size: 21px;
+  }
+
+  .flip-card,
+  .flip-inner {
+    min-height: 300px;
+  }
+
+  .flip-face {
+    padding: 18px;
+  }
+
+  .flip-face h4 {
+    font-size: 21px;
+  }
+}
 </style>
