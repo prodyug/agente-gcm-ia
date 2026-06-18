@@ -631,20 +631,103 @@ function limparFlashcards() {
 
 function gerarSimulado() {
   enviarMensagem(
-    `Modo Simulado: crie ${quantidadeQuestoes.value} questões sobre ${disciplinaSimulado.value}.
+    `Modo Simulado IDECAN: crie ${quantidadeQuestoes.value} questões sobre ${disciplinaSimulado.value}.
 
-Use o contexto do aluno, principalmente:
+Contexto do aluno:
 - banca: ${perfil.value?.banca};
 - cargo: ${perfil.value?.cargo};
 - concurso: ${perfil.value?.concurso}.
 
-Use alternativas A, B, C, D e E.
+REGRA PRINCIPAL:
+A disciplina escolhida manda no conteúdo. Não misture matérias.
+
+PADRÃO OBRIGATÓRIO DA IDECAN PARA ESTA PROVA:
+- Use apenas alternativas A, B, C e D.
+- Não use alternativa E.
+- Crie questões objetivas, com linguagem de concurso.
+- Evite questões óbvias.
+- Use pegadinhas moderadas.
+- Use uma única alternativa correta.
+- Não faça perguntas de opinião.
+- Não fuja da disciplina escolhida.
+
+SE A DISCIPLINA FOR RACIOCÍNIO LÓGICO:
+Crie questões de:
+- equivalência lógica;
+- negação de proposições;
+- conectivos lógicos;
+- tabela-verdade;
+- conjuntos;
+- relação entre conjuntos;
+- problemas lógicos;
+- sequências;
+- razão, proporção ou porcentagem simples.
+
+Não crie questões sobre conduta de guarda, trânsito, abuso de autoridade, direitos humanos ou legislação.
+
+SE A DISCIPLINA FOR PORTUGUÊS:
+Crie questões no estilo IDECAN sobre:
+- interpretação de texto;
+- inferência;
+- acentuação;
+- função das palavras no texto;
+- conjunções;
+- dêixis;
+- linguagem denotativa/conotativa;
+- artigos;
+- regência;
+- vírgula;
+- homônimos;
+- verbo haver;
+- correção gramatical.
+
+SE A DISCIPLINA FOR HISTÓRIA DE CAMPINA GRANDE:
+Use questões sobre:
+- formação administrativa;
+- Vila Nova da Rainha;
+- emancipação;
+- distritos;
+- Quebra-quilos;
+- fatos históricos locais.
+
+SE A DISCIPLINA FOR LEGISLAÇÃO OU CONHECIMENTOS ESPECÍFICOS:
+Use o padrão IDECAN:
+- analise as afirmativas I, II e III;
+- assinale a alternativa incorreta;
+- assinale a alternativa correta;
+- preencha lacunas;
+- cobre lei seca;
+- cobre competências, requisitos, princípios, prazos, conceitos e exceções.
+
+Formato obrigatório:
+Questão 1
+[enunciado]
+
+A) ...
+B) ...
+C) ...
+D) ...
 
 No final, coloque:
-- gabarito separado;
-- comentários curtos;
-- nível de dificuldade;
-- assuntos que devo revisar.`
+1. Gabarito separado no formato:
+1-A
+2-C
+3-D
+
+2. Comentários curtos, explicando por que a alternativa correta está certa.
+
+3. Nível de dificuldade.
+
+4. Assuntos que devo revisar.
+
+Antes de responder, revise internamente:
+- todas as questões pertencem à disciplina ${disciplinaSimulado.value}?
+- há somente alternativas A, B, C e D?
+- existe apenas uma correta?
+- o estilo parece IDECAN?
+- alguma questão ficou fácil demais ou genérica demais?
+
+Se alguma questão estiver ruim, reescreva antes de entregar.`
   );
 }
 
