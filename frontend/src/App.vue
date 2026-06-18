@@ -7,7 +7,9 @@ const md = new MarkdownIt({
   linkify: true,
   breaks: true,
 });
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3333";
+
 function formatarMarkdown(texto) {
   return md.render(texto || "");
 }
@@ -476,7 +478,7 @@ Regras:
       content: msg.content,
     }));
 
-    const response = await fetch("http://localhost:3333/api/chat", {
+    const response = await fetch(`${API_URL}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -517,8 +519,7 @@ Regras:
   } catch {
     messages.value.push({
       role: "assistant",
-      content:
-        "**Erro ao gerar flashcards.** Verifique se o backend está rodando em `http://localhost:3333`.",
+      content: `**Erro ao gerar flashcards.** Verifique se o backend está rodando em \`${API_URL}\`.`,
     });
   } finally {
     loading.value = false;
@@ -572,8 +573,7 @@ async function enviarMensagem(textoAtalho = null) {
   } catch {
     messages.value.push({
       role: "assistant",
-      content:
-        "**Erro ao conectar com o backend.** Verifique se o servidor está rodando em `http://localhost:3333`.",
+      content: `**Erro ao conectar com o backend.** Verifique se o servidor está rodando em \`${API_URL}\`.`,
     });
   } finally {
     loading.value = false;
@@ -597,7 +597,7 @@ async function enviarMensagem(textoAtalho = null) {
   <div class="focus-card">
     <span>Hoje</span>
     <strong>Estudar com foco</strong>
-    <small>Questões + revisão ativa + voz</small>
+    <small>Questões, revisão ativa e voz</small>
   </div>
 
   <div class="voice-card">
@@ -952,23 +952,31 @@ async function enviarMensagem(textoAtalho = null) {
 
 <style>
 :root {
-  --bg: #080a08;
-  --sidebar: #0d100d;
-  --panel: #111611;
-  --panel-soft: #171d17;
-  --card: #101410;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(118, 185, 0, 0.35);
-  --text: #f6f8f2;
-  --muted: #9fa798;
-  --green: #76b900;
-  --green-light: #d8ff75;
-  --green-soft: rgba(118, 185, 0, 0.12);
-  --red-soft: rgba(255, 80, 80, 0.11);
-  --red: #ff9b9b;
-  --blue-soft: rgba(100, 170, 255, 0.12);
-  --blue: #9cc8ff;
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --surface-muted: #eef2f7;
+  --sidebar: #ffffff;
+  --border: #dbe3ee;
+  --border-strong: #b7c6d8;
+  --text: #172033;
+  --muted: #6b778c;
+  --muted-2: #8b98aa;
+
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-soft: #e8f0ff;
+
+  --accent: #0f766e;
+  --accent-soft: #e7f7f4;
+
+  --warning: #b45309;
+  --warning-soft: #fff7ed;
+
+  --danger: #dc2626;
+  --danger-soft: #fff1f2;
+
+  --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
 }
 
 * {
@@ -988,8 +996,8 @@ body {
   font-family: Inter, Arial, sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(118, 185, 0, 0.11), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(118, 185, 0, 0.07), transparent 34%),
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.10), transparent 35%),
     var(--bg);
   overflow-x: hidden;
 }
@@ -1019,14 +1027,15 @@ button:disabled {
   width: 100%;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 230px minmax(0, 1fr);
+  grid-template-columns: 236px minmax(0, 1fr);
 }
 
 .sidebar {
   min-height: 100vh;
   padding: 22px;
-  background: rgba(10, 13, 10, 0.94);
+  background: rgba(255, 255, 255, 0.82);
   border-right: 1px solid var(--border);
+  backdrop-filter: blur(16px);
 }
 
 .brand {
@@ -1040,11 +1049,12 @@ button:disabled {
   height: 44px;
   display: grid;
   place-items: center;
-  border-radius: 15px;
-  background: linear-gradient(135deg, var(--green-light), var(--green));
-  color: #101410;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #ffffff;
   font-size: 24px;
   font-weight: 900;
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
 }
 
 .brand h1 {
@@ -1063,8 +1073,8 @@ button:disabled {
   margin-top: 24px;
   padding: 16px;
   border-radius: 20px;
-  background: var(--green-soft);
-  border: 1px solid var(--border-strong);
+  background: var(--primary-soft);
+  border: 1px solid #c7d7fe;
 }
 
 .focus-card span,
@@ -1075,7 +1085,7 @@ button:disabled {
 
 .focus-card span,
 .voice-card span {
-  color: var(--green-light);
+  color: var(--primary-dark);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -1095,13 +1105,19 @@ button:disabled {
 .voice-card {
   display: grid;
   gap: 9px;
+  background: var(--accent-soft);
+  border-color: #b8ebe4;
+}
+
+.voice-card span {
+  color: var(--accent);
 }
 
 .voice-card button {
   min-height: 40px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid #b8d7d2;
   border-radius: 13px;
-  background: rgba(118, 185, 0, 0.12);
+  background: #ffffff;
   color: var(--text);
   font-weight: 800;
 }
@@ -1110,10 +1126,10 @@ button:disabled {
   width: 100%;
   margin-top: 20px;
   padding: 13px;
-  border: 1px solid rgba(255, 80, 80, 0.3);
+  border: 1px solid #fecdd3;
   border-radius: 15px;
-  background: var(--red-soft);
-  color: var(--red);
+  background: var(--danger-soft);
+  color: var(--danger);
   font-weight: 800;
 }
 
@@ -1132,12 +1148,13 @@ button:disabled {
   padding: 18px 22px;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgba(15, 20, 15, 0.82);
+  background: rgba(255, 255, 255, 0.84);
   box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
 }
 
 .eyebrow {
-  color: var(--green-light);
+  color: var(--primary);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1161,9 +1178,9 @@ button:disabled {
   white-space: nowrap;
   padding: 10px 13px;
   border-radius: 999px;
-  background: var(--green-soft);
-  border: 1px solid var(--border-strong);
-  color: var(--green-light);
+  background: var(--primary-soft);
+  border: 1px solid #c7d7fe;
+  color: var(--primary-dark);
   font-weight: 900;
   font-size: 13px;
 }
@@ -1173,14 +1190,15 @@ button:disabled {
 }
 
 .status.listening {
-  background: var(--blue-soft);
-  border-color: rgba(156, 200, 255, 0.35);
-  color: var(--blue);
+  background: var(--warning-soft);
+  border-color: #fed7aa;
+  color: var(--warning);
 }
 
 .status.speaking {
-  background: var(--green-soft);
-  color: var(--green-light);
+  background: var(--accent-soft);
+  border-color: #b8ebe4;
+  color: var(--accent);
 }
 
 .mode-tabs {
@@ -1190,7 +1208,8 @@ button:disabled {
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 20px;
-  background: rgba(13, 18, 13, 0.75);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.04);
   overflow-x: auto;
 }
 
@@ -1205,8 +1224,8 @@ button:disabled {
 }
 
 .mode-tabs button.active {
-  color: #101410;
-  background: linear-gradient(135deg, var(--green-light), var(--green));
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
 }
 
 .tool-section {
@@ -1217,7 +1236,7 @@ button:disabled {
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgba(14, 19, 14, 0.88);
+  background: rgba(255, 255, 255, 0.88);
   box-shadow: var(--shadow);
 }
 
@@ -1257,7 +1276,7 @@ textarea {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 15px;
-  background: #070907;
+  background: #ffffff;
   color: var(--text);
   outline: none;
 }
@@ -1279,8 +1298,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.12);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .tool-card button,
@@ -1289,8 +1308,8 @@ textarea:focus {
 .study-panel button {
   border: none;
   border-radius: 15px;
-  background: linear-gradient(135deg, var(--green-light), var(--green));
-  color: #101410;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #ffffff;
   font-weight: 900;
 }
 
@@ -1313,9 +1332,9 @@ textarea:focus {
   padding: 16px;
   border-radius: 22px;
   background:
-    radial-gradient(circle at top, rgba(118, 185, 0, 0.16), transparent 45%),
-    #080b08;
-  border: 1px solid var(--border-strong);
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.10), transparent 45%),
+    #ffffff;
+  border: 1px solid var(--border);
 }
 
 .flashcard-top {
@@ -1327,7 +1346,7 @@ textarea:focus {
 }
 
 .flashcard-top span {
-  color: var(--green-light);
+  color: var(--primary-dark);
   font-weight: 900;
 }
 
@@ -1340,10 +1359,10 @@ textarea:focus {
 .flashcard-top-actions button {
   min-height: 38px;
   padding: 0 12px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--green-soft);
-  color: var(--green-light);
+  background: var(--surface-soft);
+  color: var(--text);
   font-weight: 900;
 }
 
@@ -1376,20 +1395,20 @@ textarea:focus {
   border-radius: 24px;
   border: 1px solid var(--border);
   backface-visibility: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
 }
 
 .flip-front {
   background:
-    linear-gradient(135deg, rgba(118, 185, 0, 0.18), rgba(255, 255, 255, 0.03)),
-    #101610;
+    linear-gradient(135deg, rgba(37, 99, 235, 0.10), rgba(15, 118, 110, 0.08)),
+    #ffffff;
 }
 
 .flip-back {
   transform: rotateY(180deg);
   background:
-    linear-gradient(135deg, rgba(216, 255, 117, 0.16), rgba(255, 255, 255, 0.03)),
-    #151b15;
+    linear-gradient(135deg, rgba(15, 118, 110, 0.10), rgba(37, 99, 235, 0.06)),
+    #ffffff;
 }
 
 .card-label {
@@ -1397,9 +1416,9 @@ textarea:focus {
   margin-bottom: 16px;
   padding: 7px 12px;
   border-radius: 999px;
-  background: var(--green-soft);
-  color: var(--green-light);
-  border: 1px solid var(--border-strong);
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  border: 1px solid #c7d7fe;
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1421,12 +1440,12 @@ textarea:focus {
   margin-top: 20px;
   padding: 14px;
   border-radius: 16px;
-  background: rgba(118, 185, 0, 0.1);
-  border: 1px solid var(--border-strong);
+  background: var(--accent-soft);
+  border: 1px solid #b8ebe4;
 }
 
 .memory-tip strong {
-  color: var(--green-light);
+  color: var(--accent);
 }
 
 .memory-tip p {
@@ -1443,16 +1462,16 @@ textarea:focus {
 
 .flashcard-controls button {
   min-height: 46px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 14px;
-  background: rgba(118, 185, 0, 0.1);
+  background: #ffffff;
   color: var(--text);
   font-weight: 900;
 }
 
 .flashcard-controls button:nth-child(2) {
-  background: linear-gradient(135deg, var(--green-light), var(--green));
-  color: #101410;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #ffffff;
 }
 
 .empty-flashcards {
@@ -1460,11 +1479,11 @@ textarea:focus {
   padding: 18px;
   border-radius: 20px;
   border: 1px dashed var(--border-strong);
-  background: rgba(118, 185, 0, 0.06);
+  background: var(--surface-soft);
 }
 
 .empty-flashcards strong {
-  color: var(--green-light);
+  color: var(--primary-dark);
 }
 
 .empty-flashcards p {
@@ -1483,7 +1502,7 @@ textarea:focus {
 .study-panel {
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgba(13, 18, 13, 0.9);
+  background: rgba(255, 255, 255, 0.88);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
@@ -1503,7 +1522,7 @@ textarea:focus {
   gap: 16px;
   padding: 16px 18px;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-soft);
 }
 
 .chat-header h3 {
@@ -1525,10 +1544,10 @@ textarea:focus {
 .chat-voice-actions button {
   min-height: 38px;
   padding: 0 12px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--green-soft);
-  color: var(--green-light);
+  background: #ffffff;
+  color: var(--primary-dark);
   font-weight: 900;
 }
 
@@ -1538,9 +1557,9 @@ textarea:focus {
   overflow-y: auto;
   padding: 18px;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    #070907;
+    linear-gradient(rgba(37, 99, 235, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.035) 1px, transparent 1px),
+    #fbfcff;
   background-size: 26px 26px;
 }
 
@@ -1554,13 +1573,13 @@ textarea:focus {
 
 .message.user {
   margin-left: auto;
-  background: rgba(118, 185, 0, 0.13);
-  border-color: var(--border-strong);
+  background: var(--primary-soft);
+  border-color: #c7d7fe;
 }
 
 .message.assistant {
   margin-right: auto;
-  background: rgba(20, 26, 20, 0.96);
+  background: #ffffff;
 }
 
 .message-top {
@@ -1575,8 +1594,8 @@ textarea:focus {
   display: inline-block;
   padding: 5px 9px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--green-light);
+  background: var(--surface-muted);
+  color: var(--primary-dark);
   font-size: 12px;
   font-weight: 900;
 }
@@ -1584,10 +1603,10 @@ textarea:focus {
 .listen-message {
   min-width: 34px;
   height: 34px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--green-soft);
-  color: var(--green-light);
+  background: #ffffff;
+  color: var(--primary-dark);
 }
 
 .markdown {
@@ -1616,14 +1635,14 @@ textarea:focus {
 .markdown h1,
 .markdown h2,
 .markdown h3 {
-  color: var(--green-light);
+  color: var(--primary-dark);
 }
 
 .markdown code {
   padding: 2px 6px;
   border-radius: 6px;
-  background: #000;
-  color: var(--green-light);
+  background: var(--surface-muted);
+  color: var(--primary-dark);
 }
 
 .typing {
@@ -1636,7 +1655,7 @@ textarea:focus {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--green-light);
+  background: var(--primary);
   animation: bounce 1s infinite ease-in-out;
 }
 
@@ -1654,7 +1673,7 @@ textarea:focus {
   gap: 12px;
   padding: 14px;
   border-top: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-soft);
 }
 
 .composer textarea {
@@ -1667,9 +1686,9 @@ textarea:focus {
 }
 
 .mic-btn {
-  border: 1px solid var(--border-strong) !important;
-  background: var(--green-soft) !important;
-  color: var(--green-light) !important;
+  border: 1px solid var(--border) !important;
+  background: #ffffff !important;
+  color: var(--primary-dark) !important;
   font-size: 20px;
 }
 
@@ -1694,9 +1713,14 @@ textarea:focus {
   margin-top: 9px;
   padding: 12px;
   text-align: left;
-  background: rgba(118, 185, 0, 0.1);
+  background: #ffffff;
   color: var(--text);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
+}
+
+.study-panel button:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary-dark);
 }
 
 @keyframes bounce {
@@ -1715,11 +1739,11 @@ textarea:focus {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(118, 185, 0, 0.35);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.22);
   }
 
   100% {
-    box-shadow: 0 0 0 12px rgba(118, 185, 0, 0);
+    box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
   }
 }
 
