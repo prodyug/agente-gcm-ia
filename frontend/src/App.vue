@@ -952,31 +952,33 @@ async function enviarMensagem(textoAtalho = null) {
 
 <style>
 :root {
-  --bg: #f5f7fb;
+  --bg: #f4f1ea;
   --surface: #ffffff;
-  --surface-soft: #f8fafc;
-  --surface-muted: #eef2f7;
-  --sidebar: #ffffff;
-  --border: #dbe3ee;
-  --border-strong: #b7c6d8;
-  --text: #172033;
-  --muted: #6b778c;
-  --muted-2: #8b98aa;
+  --surface-soft: #faf8f3;
+  --surface-muted: #ebe4d8;
+  --sidebar: #fbfaf7;
 
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-soft: #e8f0ff;
+  --border: #ddd3c4;
+  --border-strong: #c7b8a3;
 
-  --accent: #0f766e;
-  --accent-soft: #e7f7f4;
+  --text: #1f2933;
+  --muted: #667085;
+  --muted-2: #8a94a6;
 
-  --warning: #b45309;
-  --warning-soft: #fff7ed;
+  --primary: #1f3a5f;
+  --primary-dark: #14263f;
+  --primary-soft: #e7eef7;
 
-  --danger: #dc2626;
-  --danger-soft: #fff1f2;
+  --accent: #2f6f4e;
+  --accent-soft: #e8f3ec;
 
-  --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  --warning: #9a5b13;
+  --warning-soft: #fff4df;
+
+  --danger: #b4232f;
+  --danger-soft: #fff0f2;
+
+  --shadow: 0 18px 50px rgba(20, 38, 63, 0.10);
 }
 
 * {
@@ -996,9 +998,9 @@ body {
   font-family: Inter, Arial, sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.10), transparent 35%),
-    var(--bg);
+    radial-gradient(circle at top left, rgba(31, 58, 95, 0.10), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(47, 111, 78, 0.10), transparent 35%),
+    linear-gradient(135deg, #f7f3ea, #eef3f0);
   overflow-x: hidden;
 }
 
@@ -1054,7 +1056,7 @@ button:disabled {
   color: #ffffff;
   font-size: 24px;
   font-weight: 900;
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 12px 28px rgba(31, 58, 95, 0.25);
 }
 
 .brand h1 {
@@ -1074,7 +1076,7 @@ button:disabled {
   padding: 16px;
   border-radius: 20px;
   background: var(--primary-soft);
-  border: 1px solid #c7d7fe;
+  border: 1px solid #cbd8e6;
 }
 
 .focus-card span,
@@ -1106,8 +1108,9 @@ button:disabled {
   display: grid;
   gap: 9px;
   background: var(--accent-soft);
-  border-color: #b8ebe4;
+  border-color: #c9e2d2;
 }
+
 
 .voice-card span {
   color: var(--accent);
@@ -1179,7 +1182,7 @@ button:disabled {
   padding: 10px 13px;
   border-radius: 999px;
   background: var(--primary-soft);
-  border: 1px solid #c7d7fe;
+  border: 1px solid #cbd8e6;
   color: var(--primary-dark);
   font-weight: 900;
   font-size: 13px;
@@ -1299,9 +1302,8 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 3px rgba(31, 58, 95, 0.14);
 }
-
 .tool-card button,
 .wide-btn,
 .composer button,
@@ -1557,9 +1559,9 @@ textarea:focus {
   overflow-y: auto;
   padding: 18px;
   background:
-    linear-gradient(rgba(37, 99, 235, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.035) 1px, transparent 1px),
-    #fbfcff;
+    linear-gradient(rgba(31, 58, 95, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 58, 95, 0.035) 1px, transparent 1px),
+    #fbfaf7;
   background-size: 26px 26px;
 }
 
