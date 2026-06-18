@@ -1,4 +1,3 @@
-````vue
 <script setup>
 import { ref, watch, onMounted, nextTick, computed } from "vue";
 import MarkdownIt from "markdown-it";
@@ -258,6 +257,28 @@ function limparSessao() {
   atualizarSessaoAtiva();
 }
 
+function criarTituloInteligente(texto) {
+  const textoLimpo = texto.replace(/\s+/g, " ").trim();
+
+  if (textoLimpo.includes("Modo Simulado")) {
+    return `Simulado: ${disciplinaSimulado.value}`;
+  }
+
+  if (textoLimpo.includes("Modo Correção")) {
+    return "Correção de respostas";
+  }
+
+  if (textoLimpo.includes("Modo Plano de Estudo")) {
+    return "Plano de estudo";
+  }
+
+  if (textoLimpo.toLowerCase().includes("flashcard")) {
+    return `Flashcards: ${temaFlashcards.value}`;
+  }
+
+  return textoLimpo.slice(0, 38) || "Nova conversa";
+}
+
 function atualizarTituloSessao(texto) {
   const sessao = sessaoAtiva.value;
 
@@ -267,9 +288,7 @@ function atualizarTituloSessao(texto) {
 
   if (!titulosPadrao.includes(sessao.title)) return;
 
-  const titulo = texto.replace(/\s+/g, " ").trim().slice(0, 38);
-
-  sessao.title = titulo || "Nova conversa";
+  sessao.title = criarTituloInteligente(texto);
 }
 
 function entrar() {
@@ -706,6 +725,8 @@ Regras:
     content: `Criar ${quantidadeFlashcards.value} flashcards sobre ${temaFlashcards.value}.`,
   });
 
+  atualizarTituloSessao(`Flashcards sobre ${temaFlashcards.value}`);
+
   loading.value = true;
   sessaoAtiva.value.flashcards = [];
   sessaoAtiva.value.flashcardAtual = 0;
@@ -836,95 +857,98 @@ ${texto}`,
         <div>
           <span class="eyebrow dark">Agente de estudos</span>
 
-          <h1>Prepare seu concurso com estratégia</h1>
+```
+      <h1>Prepare seu concurso com estratégia</h1>
 
-          <p>
-            Configure sua banca, cargo e objetivo. O agente adapta questões,
-            flashcards, planos e correções para sua preparação.
-          </p>
-        </div>
+      <p>
+        Configure sua banca, cargo e objetivo. O agente adapta questões,
+        flashcards, planos e correções para sua preparação.
+      </p>
+    </div>
 
-        <div class="auth-features">
-          <div>
-            <strong>IDECAN</strong>
-            <span>Banca configurável</span>
-          </div>
-
-          <div>
-            <strong>GCM</strong>
-            <span>Foco em legislação</span>
-          </div>
-
-          <div>
-            <strong>IA</strong>
-            <span>Estudo guiado</span>
-          </div>
-        </div>
+    <div class="auth-features">
+      <div>
+        <strong>IDECAN</strong>
+        <span>Banca configurável</span>
       </div>
 
-      <form class="auth-form" @submit.prevent="entrar">
-        <div class="form-head">
-          <h2>Criar perfil</h2>
-          <p>Seu ambiente de estudo será montado com essas informações.</p>
-        </div>
+      <div>
+        <strong>GCM</strong>
+        <span>Foco em legislação</span>
+      </div>
 
-        <label>
-          Nome
-          <input v-model="loginForm.nome" placeholder="Ex: Hugo" />
-        </label>
+      <div>
+        <strong>IA</strong>
+        <span>Estudo guiado</span>
+      </div>
+    </div>
+  </div>
 
-        <label>
-          E-mail
-          <input v-model="loginForm.email" placeholder="seuemail@gmail.com" />
-        </label>
+  <form class="auth-form" @submit.prevent="entrar">
+    <div class="form-head">
+      <h2>Criar perfil</h2>
+      <p>Seu ambiente de estudo será montado com essas informações.</p>
+    </div>
 
-        <div class="auth-grid">
-          <label>
-            Banca
-            <select v-model="loginForm.banca">
-              <option v-for="banca in bancas" :key="banca">
-                {{ banca }}
-              </option>
-            </select>
-          </label>
+    <label>
+      Nome
+      <input v-model="loginForm.nome" placeholder="Ex: Hugo" />
+    </label>
 
-          <label>
-            Cargo
-            <select v-model="loginForm.cargo">
-              <option v-for="cargo in cargos" :key="cargo">
-                {{ cargo }}
-              </option>
-            </select>
-          </label>
-        </div>
+    <label>
+      E-mail
+      <input v-model="loginForm.email" placeholder="seuemail@gmail.com" />
+    </label>
 
-        <label>
-          Concurso/Cidade
-          <select v-model="loginForm.concurso">
-            <option v-for="concurso in concursos" :key="concurso">
-              {{ concurso }}
-            </option>
-          </select>
-        </label>
+    <div class="auth-grid">
+      <label>
+        Banca
+        <select v-model="loginForm.banca">
+          <option v-for="banca in bancas" :key="banca">
+            {{ banca }}
+          </option>
+        </select>
+      </label>
 
-        <label>
-          Objetivo
-          <input
-            v-model="loginForm.objetivo"
-            placeholder="Ex: passar dentro das vagas"
-          />
-        </label>
+      <label>
+        Cargo
+        <select v-model="loginForm.cargo">
+          <option v-for="cargo in cargos" :key="cargo">
+            {{ cargo }}
+          </option>
+        </select>
+      </label>
+    </div>
 
-        <button type="submit">
-          Entrar no agente
-        </button>
+    <label>
+      Concurso/Cidade
+      <select v-model="loginForm.concurso">
+        <option v-for="concurso in concursos" :key="concurso">
+          {{ concurso }}
+        </option>
+      </select>
+    </label>
 
-        <small>
-          Nesta versão, o perfil fica salvo apenas no navegador. Depois podemos
-          conectar login real com banco de dados.
-        </small>
-      </form>
-    </section>
+    <label>
+      Objetivo
+      <input
+        v-model="loginForm.objetivo"
+        placeholder="Ex: passar dentro das vagas"
+      />
+    </label>
+
+    <button type="submit">
+      Entrar no agente
+    </button>
+
+    <small>
+      Nesta versão, o perfil fica salvo apenas no navegador. Depois podemos
+      conectar login real com banco de dados.
+    </small>
+  </form>
+</section>
+```
+
   </main>
 
   <main v-else class="app">
@@ -932,406 +956,416 @@ ${texto}`,
       <div class="brand">
         <div class="brand-icon">A</div>
 
-        <div>
-          <h1>Agente IA</h1>
-          <p>Estudos para concurso</p>
-        </div>
+```
+    <div>
+      <h1>Agente IA</h1>
+      <p>Estudos para concurso</p>
+    </div>
+  </div>
+
+  <button class="new-chat" @click="criarSessao()">
+    + Nova conversa
+  </button>
+
+  <section class="profile-card">
+    <span>Perfil ativo</span>
+    <strong>{{ perfil.banca }}</strong>
+    <p>{{ perfil.cargo }}</p>
+    <small>{{ perfil.concurso }}</small>
+  </section>
+
+  <section class="sessions">
+    <div class="sessions-title">
+      <span>Sessões</span>
+    </div>
+
+    <button
+      v-for="sessao in sessoes"
+      :key="sessao.id"
+      class="session-item"
+      :class="{ active: sessao.id === sessaoAtivaId }"
+      @click="selecionarSessao(sessao.id)"
+    >
+      <span>{{ sessao.title }}</span>
+
+      <button
+        v-if="sessoes.length > 1"
+        class="delete-session"
+        @click.stop="removerSessao(sessao.id)"
+        title="Excluir sessão"
+      >
+        ×
+      </button>
+    </button>
+  </section>
+
+  <div class="sidebar-actions">
+    <button @click="falarUltimaResposta" :disabled="loading">
+      🔊 Ler última
+    </button>
+
+    <button @click="limparSessao">
+      Limpar sessão
+    </button>
+
+    <button class="logout" @click="sair">
+      Sair
+    </button>
+  </div>
+</aside>
+
+<section class="workspace" :class="{ 'has-tool': ferramentaAtiva }">
+  <header class="topbar">
+    <div>
+      <span class="eyebrow">Agente de Estudos para Concursos</span>
+      <h2>{{ sessaoAtiva?.title || "Nova conversa" }}</h2>
+      <p>
+        {{ perfil.banca }} • {{ perfil.cargo }} • {{ perfil.concurso }}
+      </p>
+    </div>
+
+    <div class="status-group">
+      <div class="status" :class="{ thinking: loading }">
+        {{ loading ? "Pensando..." : "Pronto" }}
       </div>
 
-      <button class="new-chat" @click="criarSessao()">
-        + Nova conversa
-      </button>
+      <div v-if="ouvindo" class="status listening">
+        Ouvindo...
+      </div>
 
-      <section class="profile-card">
-        <span>Perfil ativo</span>
-        <strong>{{ perfil.banca }}</strong>
-        <p>{{ perfil.cargo }}</p>
-        <small>{{ perfil.concurso }}</small>
+      <div v-if="falando" class="status speaking">
+        Lendo...
+      </div>
+    </div>
+  </header>
+
+  <section class="tools-row">
+    <button
+      :class="{ active: ferramentaAtiva === 'simulado' }"
+      @click="ferramentaAtiva = ferramentaAtiva === 'simulado' ? null : 'simulado'"
+    >
+      Simulado
+    </button>
+
+    <button
+      :class="{ active: ferramentaAtiva === 'flashcards' }"
+      @click="ferramentaAtiva = ferramentaAtiva === 'flashcards' ? null : 'flashcards'"
+    >
+      Flashcards
+    </button>
+
+    <button
+      :class="{ active: ferramentaAtiva === 'plano' }"
+      @click="ferramentaAtiva = ferramentaAtiva === 'plano' ? null : 'plano'"
+    >
+      Plano
+    </button>
+
+    <button
+      :class="{ active: ferramentaAtiva === 'correcao' }"
+      @click="ferramentaAtiva = ferramentaAtiva === 'correcao' ? null : 'correcao'"
+    >
+      Correção
+    </button>
+  </section>
+
+  <section class="chat-panel">
+    <div ref="chatRef" class="chat-area">
+      <section v-if="!mensagensAtivas.length" class="welcome-card">
+        <span class="welcome-kicker">Perfil pronto</span>
+
+        <h3>Olá, {{ perfil.nome }}.</h3>
+
+        <p>
+          Seu agente está configurado para
+          <strong>{{ perfil.banca }}</strong>,
+          <strong>{{ perfil.cargo }}</strong> e
+          <strong>{{ perfil.concurso }}</strong>.
+        </p>
+
+        <div class="welcome-actions">
+          <button @click="enviarMensagem(`Crie 5 questões no estilo ${perfil.banca} para ${perfil.cargo}.`)">
+            Criar questões
+          </button>
+
+          <button @click="ferramentaAtiva = 'flashcards'">
+            Abrir flashcards
+          </button>
+
+          <button @click="gerarPlanoDia">
+            Plano de hoje
+          </button>
+        </div>
       </section>
 
-      <section class="sessions">
-        <div class="sessions-title">
-          <span>Sessões</span>
-        </div>
-
-        <button
-          v-for="sessao in sessoes"
-          :key="sessao.id"
-          class="session-item"
-          :class="{ active: sessao.id === sessaoAtivaId }"
-          @click="selecionarSessao(sessao.id)"
-        >
-          <span>{{ sessao.title }}</span>
+      <div
+        v-for="(msg, index) in mensagensAtivas"
+        :key="index"
+        :class="['message', msg.role]"
+      >
+        <div class="message-top">
+          <div class="message-name">
+            {{ msg.role === "user" ? "Você" : "Agente IA" }}
+          </div>
 
           <button
-            v-if="sessoes.length > 1"
-            class="delete-session"
-            @click.stop="removerSessao(sessao.id)"
-            title="Excluir sessão"
+            v-if="msg.role === 'assistant'"
+            class="listen-message"
+            @click="falarTexto(msg.content)"
+            :disabled="loading"
+            title="Ler esta resposta"
           >
-            ×
+            🔊
           </button>
-        </button>
-      </section>
+        </div>
 
-      <div class="sidebar-actions">
-        <button @click="falarUltimaResposta" :disabled="loading">
-          🔊 Ler última
-        </button>
+        <div class="markdown" v-html="formatarMarkdown(msg.content)"></div>
+      </div>
 
-        <button @click="limparSessao">
-          Limpar sessão
-        </button>
+      <div v-if="loading" class="message assistant">
+        <div class="message-top">
+          <div class="message-name">Agente IA</div>
+        </div>
 
-        <button class="logout" @click="sair">
-          Sair
+        <div class="typing">
+          <i></i>
+          <i></i>
+          <i></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-badges">
+      <button
+        v-for="prompt in perguntasRapidas"
+        :key="prompt"
+        @click="enviarMensagem(prompt)"
+        :disabled="loading"
+      >
+        {{ prompt }}
+      </button>
+    </div>
+
+    <div class="composer">
+      <button
+        class="mic-btn"
+        @click="iniciarDitado"
+        :disabled="loading || ouvindo"
+        title="Falar pergunta"
+      >
+        {{ ouvindo ? "🎙️" : "🎤" }}
+      </button>
+
+      <textarea
+        v-model="mensagem"
+        placeholder="Pergunte sobre seu concurso, peça questões, flashcards, plano ou correção..."
+        @keydown.enter.prevent="enviarMensagem()"
+      ></textarea>
+
+      <button @click="enviarMensagem()" :disabled="loading">
+        {{ loading ? "..." : "Enviar" }}
+      </button>
+    </div>
+  </section>
+
+  <aside v-if="ferramentaAtiva" class="tool-card">
+    <div v-if="ferramentaAtiva === 'simulado'">
+      <div class="tool-title">
+        <span>Ferramenta</span>
+        <h3>Gerar simulado</h3>
+        <p>Questões adaptadas à banca e ao cargo escolhido.</p>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Disciplina
+          <select v-model="disciplinaSimulado">
+            <option v-for="disciplina in disciplinas" :key="disciplina">
+              {{ disciplina }}
+            </option>
+          </select>
+        </label>
+
+        <label>
+          Questões
+          <input
+            type="number"
+            v-model="quantidadeQuestoes"
+            min="1"
+            max="20"
+          />
+        </label>
+
+        <button @click="gerarSimulado" :disabled="loading">
+          Gerar simulado
         </button>
       </div>
-    </aside>
+    </div>
 
-    <section class="workspace">
-      <header class="topbar">
-        <div>
-          <span class="eyebrow">Agente de Estudos para Concursos</span>
-          <h2>{{ sessaoAtiva?.title || "Nova conversa" }}</h2>
-          <p>
-            {{ perfil.banca }} • {{ perfil.cargo }} • {{ perfil.concurso }}
-          </p>
-        </div>
+    <div v-if="ferramentaAtiva === 'plano'">
+      <div class="tool-title">
+        <span>Ferramenta</span>
+        <h3>Plano de estudo</h3>
+        <p>Monte uma rotina simples para o dia.</p>
+      </div>
 
-        <div class="status-group">
-          <div class="status" :class="{ thinking: loading }">
-            {{ loading ? "Pensando..." : "Pronto" }}
-          </div>
+      <div class="form-row two">
+        <label>
+          Tempo
+          <input v-model="tempoEstudo" placeholder="Ex: 2 horas" />
+        </label>
 
-          <div v-if="ouvindo" class="status listening">
-            Ouvindo...
-          </div>
+        <label>
+          Foco
+          <select v-model="focoEstudo">
+            <option v-for="foco in focos" :key="foco">
+              {{ foco }}
+            </option>
+          </select>
+        </label>
+      </div>
 
-          <div v-if="falando" class="status speaking">
-            Lendo...
-          </div>
-        </div>
-      </header>
+      <textarea
+        v-model="dificuldadeEstudo"
+        placeholder="Dificuldades. Ex: crase, constitucional e abuso de autoridade."
+      ></textarea>
 
-      <section class="tools-row">
-        <button
-          :class="{ active: ferramentaAtiva === 'simulado' }"
-          @click="ferramentaAtiva = ferramentaAtiva === 'simulado' ? null : 'simulado'"
-        >
-          Simulado
-        </button>
+      <button class="wide-btn" @click="gerarPlanoDia" :disabled="loading">
+        Gerar plano
+      </button>
+    </div>
 
-        <button
-          :class="{ active: ferramentaAtiva === 'flashcards' }"
-          @click="ferramentaAtiva = ferramentaAtiva === 'flashcards' ? null : 'flashcards'"
-        >
-          Flashcards
-        </button>
+    <div v-if="ferramentaAtiva === 'correcao'">
+      <div class="tool-title">
+        <span>Ferramenta</span>
+        <h3>Correção</h3>
+        <p>Cole suas respostas para receber análise dos erros.</p>
+      </div>
 
-        <button
-          :class="{ active: ferramentaAtiva === 'plano' }"
-          @click="ferramentaAtiva = ferramentaAtiva === 'plano' ? null : 'plano'"
-        >
-          Plano
-        </button>
+      <textarea
+        v-model="respostasAluno"
+        placeholder="Ex:
+```
 
-        <button
-          :class="{ active: ferramentaAtiva === 'correcao' }"
-          @click="ferramentaAtiva = ferramentaAtiva === 'correcao' ? null : 'correcao'"
-        >
-          Correção
-        </button>
-      </section>
-
-      <section v-if="ferramentaAtiva" class="tool-card">
-        <div v-if="ferramentaAtiva === 'simulado'">
-          <div class="tool-title">
-            <h3>Gerar simulado</h3>
-            <p>Questões adaptadas à banca e ao cargo escolhido.</p>
-          </div>
-
-          <div class="form-row">
-            <label>
-              Disciplina
-              <select v-model="disciplinaSimulado">
-                <option v-for="disciplina in disciplinas" :key="disciplina">
-                  {{ disciplina }}
-                </option>
-              </select>
-            </label>
-
-            <label>
-              Questões
-              <input
-                type="number"
-                v-model="quantidadeQuestoes"
-                min="1"
-                max="20"
-              />
-            </label>
-
-            <button @click="gerarSimulado" :disabled="loading">
-              Gerar
-            </button>
-          </div>
-        </div>
-
-        <div v-if="ferramentaAtiva === 'plano'">
-          <div class="tool-title">
-            <h3>Plano de estudo</h3>
-            <p>Monte uma rotina simples para o dia.</p>
-          </div>
-
-          <div class="form-row two">
-            <label>
-              Tempo
-              <input v-model="tempoEstudo" placeholder="Ex: 2 horas" />
-            </label>
-
-            <label>
-              Foco
-              <select v-model="focoEstudo">
-                <option v-for="foco in focos" :key="foco">
-                  {{ foco }}
-                </option>
-              </select>
-            </label>
-          </div>
-
-          <textarea
-            v-model="dificuldadeEstudo"
-            placeholder="Dificuldades. Ex: crase, constitucional e abuso de autoridade."
-          ></textarea>
-
-          <button class="wide-btn" @click="gerarPlanoDia" :disabled="loading">
-            Gerar plano
-          </button>
-        </div>
-
-        <div v-if="ferramentaAtiva === 'correcao'">
-          <div class="tool-title">
-            <h3>Correção</h3>
-            <p>Cole suas respostas para receber análise dos erros.</p>
-          </div>
-
-          <textarea
-            v-model="respostasAluno"
-            placeholder="Ex:
 1-A
 2-C
 3-B
 4-D
 5-E"
-          ></textarea>
+></textarea>
 
-          <button
-            class="wide-btn"
-            @click="corrigirRespostas"
-            :disabled="loading"
-          >
-            Corrigir respostas
-          </button>
-        </div>
+```
+      <button
+        class="wide-btn"
+        @click="corrigirRespostas"
+        :disabled="loading"
+      >
+        Corrigir respostas
+      </button>
+    </div>
 
-        <div v-if="ferramentaAtiva === 'flashcards'">
-          <div class="tool-title">
-            <h3>Flashcards da sessão</h3>
-            <p>Cards salvos apenas nesta sessão de estudo.</p>
-          </div>
+    <div v-if="ferramentaAtiva === 'flashcards'">
+      <div class="tool-title">
+        <span>Ferramenta</span>
+        <h3>Flashcards</h3>
+        <p>Cards salvos apenas nesta sessão de estudo.</p>
+      </div>
 
-          <div class="form-row">
-            <label>
-              Tema
-              <select v-model="temaFlashcards">
-                <option v-for="tema in temasFlashcards" :key="tema">
-                  {{ tema }}
-                </option>
-              </select>
-            </label>
+      <div class="form-row">
+        <label>
+          Tema
+          <select v-model="temaFlashcards">
+            <option v-for="tema in temasFlashcards" :key="tema">
+              {{ tema }}
+            </option>
+          </select>
+        </label>
 
-            <label>
-              Cards
-              <input
-                type="number"
-                v-model="quantidadeFlashcards"
-                min="3"
-                max="30"
-              />
-            </label>
+        <label>
+          Cards
+          <input
+            type="number"
+            v-model="quantidadeFlashcards"
+            min="3"
+            max="30"
+          />
+        </label>
 
-            <button @click="gerarFlashcards" :disabled="loading">
-              Criar
+        <button @click="gerarFlashcards" :disabled="loading">
+          Criar flashcards
+        </button>
+      </div>
+
+      <div
+        v-if="flashcardsAtivos.length && flashcardAtualDados"
+        class="flashcard-study"
+      >
+        <div class="flashcard-top">
+          <span>
+            Card {{ (sessaoAtiva?.flashcardAtual || 0) + 1 }} de
+            {{ flashcardsAtivos.length }}
+          </span>
+
+          <div class="flashcard-top-actions">
+            <button @click="falarFlashcardAtual">
+              🔊 Ouvir
+            </button>
+
+            <button @click="embaralharFlashcards">
+              Embaralhar
+            </button>
+
+            <button @click="limparFlashcards">
+              Limpar
             </button>
           </div>
-
-          <div
-            v-if="flashcardsAtivos.length && flashcardAtualDados"
-            class="flashcard-study"
-          >
-            <div class="flashcard-top">
-              <span>
-                Card {{ (sessaoAtiva?.flashcardAtual || 0) + 1 }} de
-                {{ flashcardsAtivos.length }}
-              </span>
-
-              <div class="flashcard-top-actions">
-                <button @click="falarFlashcardAtual">
-                  🔊 Ouvir
-                </button>
-
-                <button @click="embaralharFlashcards">
-                  Embaralhar
-                </button>
-
-                <button @click="limparFlashcards">
-                  Limpar
-                </button>
-              </div>
-            </div>
-
-            <div
-              class="flip-card"
-              :class="{ flipped: sessaoAtiva?.cardVirado }"
-              @click="virarFlashcard"
-            >
-              <div class="flip-inner">
-                <div class="flip-face flip-front">
-                  <span class="card-label">Pergunta</span>
-                  <h4>{{ flashcardAtualDados.pergunta }}</h4>
-                  <small>Clique para ver a resposta</small>
-                </div>
-
-                <div class="flip-face flip-back">
-                  <span class="card-label">Resposta</span>
-                  <h4>{{ flashcardAtualDados.resposta }}</h4>
-
-                  <div class="memory-tip">
-                    <strong>Dica</strong>
-                    <p>{{ flashcardAtualDados.dica }}</p>
-                  </div>
-
-                  <small>Clique para voltar</small>
-                </div>
-              </div>
-            </div>
-
-            <div class="flashcard-controls">
-              <button @click="flashcardAnterior">
-                ← Anterior
-              </button>
-
-              <button @click="virarFlashcard">
-                {{ sessaoAtiva?.cardVirado ? "Ver pergunta" : "Ver resposta" }}
-              </button>
-
-              <button @click="proximoFlashcard">
-                Próximo →
-              </button>
-            </div>
-          </div>
         </div>
-      </section>
 
-      <section class="chat-panel">
-        <div ref="chatRef" class="chat-area">
-          <section v-if="!mensagensAtivas.length" class="welcome-card">
-            <span class="welcome-kicker">Perfil pronto</span>
-
-            <h3>Olá, {{ perfil.nome }}.</h3>
-
-            <p>
-              Seu agente está configurado para
-              <strong>{{ perfil.banca }}</strong>,
-              <strong>{{ perfil.cargo }}</strong> e
-              <strong>{{ perfil.concurso }}</strong>.
-            </p>
-
-            <div class="welcome-actions">
-              <button @click="enviarMensagem(`Crie 5 questões no estilo ${perfil.banca} para ${perfil.cargo}.`)">
-                Criar questões
-              </button>
-
-              <button @click="ferramentaAtiva = 'flashcards'">
-                Abrir flashcards
-              </button>
-
-              <button @click="gerarPlanoDia">
-                Plano de hoje
-              </button>
+        <div
+          class="flip-card"
+          :class="{ flipped: sessaoAtiva?.cardVirado }"
+          @click="virarFlashcard"
+        >
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <span class="card-label">Pergunta</span>
+              <h4>{{ flashcardAtualDados.pergunta }}</h4>
+              <small>Clique para ver a resposta</small>
             </div>
-          </section>
 
-          <div
-            v-for="(msg, index) in mensagensAtivas"
-            :key="index"
-            :class="['message', msg.role]"
-          >
-            <div class="message-top">
-              <div class="message-name">
-                {{ msg.role === "user" ? "Você" : "Agente IA" }}
+            <div class="flip-face flip-back">
+              <span class="card-label">Resposta</span>
+              <h4>{{ flashcardAtualDados.resposta }}</h4>
+
+              <div class="memory-tip">
+                <strong>Dica</strong>
+                <p>{{ flashcardAtualDados.dica }}</p>
               </div>
 
-              <button
-                v-if="msg.role === 'assistant'"
-                class="listen-message"
-                @click="falarTexto(msg.content)"
-                :disabled="loading"
-                title="Ler esta resposta"
-              >
-                🔊
-              </button>
-            </div>
-
-            <div class="markdown" v-html="formatarMarkdown(msg.content)"></div>
-          </div>
-
-          <div v-if="loading" class="message assistant">
-            <div class="message-top">
-              <div class="message-name">Agente IA</div>
-            </div>
-
-            <div class="typing">
-              <i></i>
-              <i></i>
-              <i></i>
+              <small>Clique para voltar</small>
             </div>
           </div>
         </div>
 
-        <div class="quick-badges">
-          <button
-            v-for="prompt in perguntasRapidas"
-            :key="prompt"
-            @click="enviarMensagem(prompt)"
-            :disabled="loading"
-          >
-            {{ prompt }}
+        <div class="flashcard-controls">
+          <button @click="flashcardAnterior">
+            ← Anterior
+          </button>
+
+          <button @click="virarFlashcard">
+            {{ sessaoAtiva?.cardVirado ? "Ver pergunta" : "Ver resposta" }}
+          </button>
+
+          <button @click="proximoFlashcard">
+            Próximo →
           </button>
         </div>
+      </div>
+    </div>
+  </aside>
+</section>
+```
 
-        <div class="composer">
-          <button
-            class="mic-btn"
-            @click="iniciarDitado"
-            :disabled="loading || ouvindo"
-            title="Falar pergunta"
-          >
-            {{ ouvindo ? "🎙️" : "🎤" }}
-          </button>
-
-          <textarea
-            v-model="mensagem"
-            placeholder="Pergunte sobre seu concurso, peça questões, flashcards, plano ou correção..."
-            @keydown.enter.prevent="enviarMensagem()"
-          ></textarea>
-
-          <button @click="enviarMensagem()" :disabled="loading">
-            {{ loading ? "..." : "Enviar" }}
-          </button>
-        </div>
-      </section>
-    </section>
   </main>
 </template>
 
@@ -1849,16 +1883,30 @@ textarea:focus {
 .workspace {
   height: 100vh;
   width: 100%;
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-areas:
+    "topbar"
+    "tools"
+    "chat";
+  gap: 12px;
   overflow: hidden;
 }
 
+.workspace.has-tool {
+  grid-template-columns: minmax(0, 1fr) 410px;
+  grid-template-areas:
+    "topbar topbar"
+    "tools tools"
+    "chat tool";
+}
+
 .topbar {
+  grid-area: topbar;
   min-height: 104px;
   display: flex;
   align-items: center;
@@ -1872,11 +1920,15 @@ textarea:focus {
 }
 
 .topbar h2 {
+  max-width: 820px;
   margin: 8px 0 2px;
   color: var(--ink);
   font-size: clamp(24px, 3vw, 32px);
   line-height: 1.05;
   letter-spacing: -0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar p {
@@ -1920,6 +1972,7 @@ textarea:focus {
 }
 
 .tools-row {
+  grid-area: tools;
   display: flex;
   gap: 8px;
   padding: 2px 0;
@@ -1949,60 +2002,10 @@ textarea:focus {
   color: #fffaf0;
 }
 
-.tool-card {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: var(--surface);
-  box-shadow: 0 14px 34px rgba(32, 39, 25, 0.08);
-}
-
-.tool-title h3 {
-  margin: 0;
-  color: var(--ink);
-  font-size: 19px;
-}
-
-.tool-title p {
-  margin: 4px 0 0;
-  color: var(--muted);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) 110px 120px;
-  gap: 12px;
-  align-items: end;
-  margin-top: 14px;
-}
-
-.form-row.two {
-  grid-template-columns: 1fr 1fr;
-}
-
-.form-row button,
-.wide-btn {
-  min-height: 46px;
-  border: none;
-  border-radius: 14px;
-  background: var(--ink);
-  color: #fffaf0;
-  font-weight: 950;
-}
-
-.form-row button:hover:not(:disabled),
-.wide-btn:hover:not(:disabled) {
-  background: var(--olive-900);
-}
-
-.wide-btn {
-  width: 100%;
-  margin-top: 12px;
-}
-
 .chat-panel {
+  grid-area: chat;
   min-height: 0;
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
@@ -2017,19 +2020,22 @@ textarea:focus {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 30px 24px 18px;
+  padding: 34px 28px 20px;
   background: var(--surface);
 }
 
-.chat-area::-webkit-scrollbar {
+.chat-area::-webkit-scrollbar,
+.tool-card::-webkit-scrollbar {
   width: 8px;
 }
 
-.chat-area::-webkit-scrollbar-track {
+.chat-area::-webkit-scrollbar-track,
+.tool-card::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.chat-area::-webkit-scrollbar-thumb {
+.chat-area::-webkit-scrollbar-thumb,
+.tool-card::-webkit-scrollbar-thumb {
   background: var(--border-strong);
   border-radius: 999px;
 }
@@ -2103,14 +2109,14 @@ textarea:focus {
 }
 
 .message {
-  max-width: 820px;
-  margin: 0 auto 22px;
+  max-width: 840px;
+  margin: 0 auto 24px;
   padding: 0;
 }
 
 .message-top {
   width: 100%;
-  max-width: 820px;
+  max-width: 840px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2138,10 +2144,10 @@ textarea:focus {
 }
 
 .message.assistant .markdown {
-  max-width: 820px;
+  max-width: 840px;
   color: var(--text);
-  font-size: 15.5px;
-  line-height: 1.75;
+  font-size: 16px;
+  line-height: 1.78;
 }
 
 .message.user .markdown {
@@ -2163,7 +2169,7 @@ textarea:focus {
 }
 
 .markdown {
-  line-height: 1.75;
+  line-height: 1.78;
   overflow-wrap: anywhere;
 }
 
@@ -2224,7 +2230,7 @@ textarea:focus {
 }
 
 .quick-badges {
-  max-width: 860px;
+  max-width: 880px;
   width: 100%;
   margin: 0 auto;
   display: flex;
@@ -2258,7 +2264,7 @@ textarea:focus {
 }
 
 .composer {
-  max-width: 860px;
+  max-width: 880px;
   width: 100%;
   margin: 0 auto;
   display: grid;
@@ -2305,9 +2311,88 @@ textarea:focus {
   font-size: 18px;
 }
 
+.tool-card {
+  grid-area: tool;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: 0 18px 46px rgba(32, 39, 25, 0.08);
+}
+
+.tool-title {
+  margin-bottom: 16px;
+}
+
+.tool-title span {
+  display: inline-flex;
+  width: max-content;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--olive-900);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tool-title h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 23px;
+  letter-spacing: -0.03em;
+}
+
+.tool-title p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: end;
+  margin-top: 14px;
+}
+
+.form-row.two {
+  grid-template-columns: 1fr;
+}
+
+.form-row button,
+.wide-btn {
+  min-height: 48px;
+  border: none;
+  border-radius: 14px;
+  background: var(--ink);
+  color: #fffaf0;
+  font-weight: 950;
+}
+
+.form-row button:hover:not(:disabled),
+.wide-btn:hover:not(:disabled) {
+  background: var(--olive-900);
+}
+
+.wide-btn {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.tool-card textarea {
+  min-height: 140px;
+}
+
 .flashcard-study {
   margin-top: 16px;
-  padding: 16px;
+  padding: 15px;
   border-radius: 20px;
   background: var(--surface-soft);
   border: 1px solid var(--border);
@@ -2315,8 +2400,8 @@ textarea:focus {
 
 .flashcard-top {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -2327,12 +2412,14 @@ textarea:focus {
 }
 
 .flashcard-top-actions {
+  width: 100%;
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
 .flashcard-top-actions button {
+  flex: 1;
   min-height: 36px;
   padding: 0 12px;
   border: 1px solid var(--border);
@@ -2344,7 +2431,7 @@ textarea:focus {
 
 .flip-card {
   width: 100%;
-  min-height: 260px;
+  min-height: 320px;
   perspective: 1200px;
   cursor: pointer;
 }
@@ -2352,7 +2439,7 @@ textarea:focus {
 .flip-inner {
   position: relative;
   width: 100%;
-  min-height: 260px;
+  min-height: 320px;
   transition: transform 0.7s ease;
   transform-style: preserve-3d;
 }
@@ -2367,7 +2454,7 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 26px;
+  padding: 22px;
   border: 1px solid var(--border);
   border-radius: 22px;
   background:
@@ -2397,7 +2484,7 @@ textarea:focus {
 
 .flip-face h4 {
   margin: 0;
-  font-size: clamp(22px, 3vw, 32px);
+  font-size: clamp(20px, 2vw, 28px);
   line-height: 1.25;
   letter-spacing: -0.03em;
 }
@@ -2426,7 +2513,7 @@ textarea:focus {
 
 .flashcard-controls {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-top: 12px;
 }
@@ -2470,6 +2557,12 @@ textarea:focus {
   }
 }
 
+@media (max-width: 1180px) {
+  .workspace.has-tool {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+}
+
 @media (max-width: 1050px) {
   .app {
     grid-template-columns: 1fr;
@@ -2483,11 +2576,23 @@ textarea:focus {
     border-bottom: 1px solid rgba(255, 250, 240, 0.1);
   }
 
-  .workspace {
+  .workspace,
+  .workspace.has-tool {
     height: auto;
     min-height: 100vh;
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
     overflow: visible;
+  }
+
+  .chat-panel {
+    min-height: 650px;
+  }
+
+  .tool-card {
+    height: auto;
+    max-height: none;
   }
 
   .auth-card {
@@ -2525,8 +2630,6 @@ textarea:focus {
   }
 
   .auth-grid,
-  .form-row,
-  .form-row.two,
   .composer {
     grid-template-columns: 1fr;
   }
@@ -2534,6 +2637,11 @@ textarea:focus {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .topbar h2 {
+    max-width: 100%;
+    white-space: normal;
   }
 
   .status-group {
@@ -2549,19 +2657,9 @@ textarea:focus {
     min-height: 48px;
   }
 
-  .flashcard-top {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .flashcard-controls {
-    grid-template-columns: 1fr;
-  }
-
   .flip-card,
   .flip-inner {
     min-height: 340px;
   }
 }
 </style>
-````
