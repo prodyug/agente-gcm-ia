@@ -1772,10 +1772,12 @@ textarea:focus {
 
 .app {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 80% -10%, rgba(122, 135, 85, 0.14), transparent 30%),
+    var(--bg);
   overflow: hidden;
 }
 
@@ -2021,7 +2023,9 @@ textarea:focus {
   padding: 16px 20px;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgba(255, 253, 248, 0.96);
+  background:
+    linear-gradient(105deg, rgba(255, 253, 248, 0.98), rgba(247, 243, 232, 0.88)),
+    var(--surface);
   box-shadow: 0 14px 36px rgba(32, 39, 25, 0.08);
 }
 
@@ -2116,7 +2120,7 @@ textarea:focus {
   flex-direction: column;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: var(--surface);
+  background: rgba(255, 253, 248, 0.94);
   box-shadow: 0 18px 46px rgba(32, 39, 25, 0.08);
   overflow: hidden;
 }
@@ -2254,6 +2258,7 @@ textarea:focus {
   color: var(--text);
   font-size: 16px;
   line-height: 1.78;
+  text-wrap: pretty;
 }
 
 .message.user .markdown {
@@ -2425,7 +2430,9 @@ textarea:focus {
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: var(--surface);
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(247, 243, 232, 0.9)),
+    var(--surface);
   box-shadow: 0 18px 46px rgba(32, 39, 25, 0.08);
 }
 
@@ -2707,6 +2714,89 @@ textarea:focus {
 
   .auth-copy {
     min-height: 420px;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1050px) {
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    min-height: 0;
+    padding: 12px 20px;
+    box-shadow: 0 8px 22px rgba(18, 21, 16, 0.18);
+  }
+
+  .brand {
+    justify-content: space-between;
+    padding: 0;
+    border: 0;
+  }
+
+  .mobile-menu-toggle {
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(255, 250, 240, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 250, 240, 0.08);
+    color: #fffaf0;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .sidebar-content {
+    display: none;
+    max-height: min(460px, calc(100dvh - 66px));
+    overflow-y: auto;
+    padding-top: 12px;
+  }
+
+  .sidebar-content.open {
+    display: flex;
+  }
+
+  .sessions {
+    max-height: 190px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app {
+    grid-template-columns: 296px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding: 22px 16px;
+  }
+
+  .workspace {
+    max-width: 1440px;
+    padding: 22px 28px;
+    gap: 16px;
+  }
+
+  .workspace.has-tool {
+    grid-template-columns: minmax(520px, 1fr) minmax(370px, 420px);
+  }
+
+  .topbar {
+    min-height: 112px;
+    padding: 18px 24px;
+  }
+
+  .chat-area {
+    padding: 38px 40px 24px;
+  }
+
+  .quick-badges,
+  .composer {
+    max-width: 920px;
+  }
+
+  .tool-card {
+    padding: 24px;
   }
 }
 

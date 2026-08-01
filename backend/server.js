@@ -6,6 +6,7 @@ import {
   findSimulationReferences,
   formatSimulationReferences,
 } from "./referenceRepository.js";
+import { formatIdecanCalibration } from "./idecanCalibration.js";
 
 dotenv.config();
 
@@ -437,7 +438,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const references = await findSimulationReferences(message);
-    const referenceContext = formatSimulationReferences(references);
+    const referenceContext = `${formatIdecanCalibration(message)}${formatSimulationReferences(references)}`;
 
     const resposta = await client.chat.completions.create({
       model: process.env.NVIDIA_MODEL || "meta/llama-3.1-8b-instruct",
