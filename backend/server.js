@@ -1,15 +1,37 @@
-```js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import {
+  findSimulationReferences,
+  formatSimulationReferences,
+} from "./referenceRepository.js";
 
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3333;
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors());
-app.use(express.json({ limit: "2mb" }));
+if (!process.env.NVIDIA_API_KEY) {
+  throw new Error("NVIDIA_API_KEY deve ser configurada no ambiente.");
+}
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origem não permitida pelo CORS."));
+    },
+  })
+);
+app.use(express.json({ limit: "128kb" }));
 
 const client = new OpenAI({
   apiKey: process.env.NVIDIA_API_KEY,
@@ -355,56 +377,92 @@ REGRAS GERAIS
 - Responda sempre em português do Brasil.
 - Seja direto, didático e voltado para aprovação.
 - Explique de forma simples, mas com precisão.
-- Não invente leis, artigos ou informações.
-- Quando não tiver certeza, diga que não tem certeza.
 - Quando corrigir respostas, explique o erro do aluno e indique o que revisar.
 - Quando criar plano de estudo, seja prático e realista.
 - Quando criar flashcards, seja objetivo.
+
+===============================================================
+PROTOCOLO DE PRECISÃO E FONTES
+===============================================================
+
+Sua prioridade é a precisão, não completar uma resposta a qualquer custo.
+
+1. Não invente leis, artigos, incisos, súmulas, datas, editais, jurisprudência, estatísticas, provas anteriores ou referências.
+2. Em conteúdo jurídico, priorize o texto de fonte primária oficial. Cite número de artigo ou dispositivo apenas quando tiver certeza; se houver dúvida, explique o conceito sem atribuir uma referência numérica e oriente a conferência na fonte oficial.
+3. Diferencie claramente texto legal, interpretação didática e exemplo. Nunca apresente interpretação como se fosse transcrição da lei.
+4. Para normas, editais, cronogramas ou jurisprudência que possam ter mudado, informe que a confirmação deve ser feita na versão oficial vigente. Não afirme que algo é atual sem uma fonte fornecida na conversa.
+5. Se não tiver base confiável para responder, diga exatamente o que não consegue confirmar. Peça a fonte ou indique onde o aluno deve conferir, em vez de supor uma resposta.
+6. Não crie links, citações ou nomes de documentos que não tenha certeza de que existem.
+7. Antes de criar questão, confirme silenciosamente que existe uma única alternativa correta e que a explicação/gabarito possui fundamento confiável. Se não conseguir, troque o tema ou reformule a questão.
+8. Na correção de simulados, não invente gabarito por memória. Se o enunciado completo não estiver disponível na conversa, peça que o aluno envie novamente as questões antes de corrigir.
+9. Ao explicar um ponto de legislação, prefira esta ordem: regra, exceção relevante, exemplo prático e indicação da fonte oficial a consultar.
 `;
 
 app.get("/", (req, res) => {
   res.send("Backend do Agente GCM IA está funcionando!");
 });
 
-app.post("/api/teste", (req, res) => {
-  res.json({
-    message: "POST funcionando!",
-    body: req.body,
-  });
+app.get("/healthz", (req, res) => {
+  res.json({ status: "ok" });
 });
 
 app.post("/api/chat", async (req, res) => {
   try {
     const { message, history = [] } = req.body;
 
-    if (!message) {
+    if (
+      typeof message !== "string" ||
+      !message.trim() ||
+      message.length > 12000
+    ) {
       return res.status(400).json({
-        error: "Envie uma mensagem no campo 'message'.",
+        error: "Envie uma mensagem de até 12.000 caracteres.",
       });
     }
 
-    const safeHistory = history
-      .filter((item) => item.role === "user" || item.role === "assistant")
-      .slice(-8);
+    if (
+      !Array.isArray(history) ||
+      history.length > 8 ||
+      !history.every(
+        (item) =>
+          item &&
+          (item.role === "user" || item.role === "assistant") &&
+          typeof item.content === "string" &&
+          item.content.length <= 12000
+      )
+    ) {
+      return res.status(400).json({
+        error: "O histórico da conversa é inválido.",
+      });
+    }
+
+    const references = await findSimulationReferences(message);
+    const referenceContext = formatSimulationReferences(references);
 
     const resposta = await client.chat.completions.create({
       model: process.env.NVIDIA_MODEL || "meta/llama-3.1-8b-instruct",
       messages: [
         {
           role: "system",
-          content: systemPrompt,
+          content: `${systemPrompt}${referenceContext}`,
         },
-        ...safeHistory,
+        ...history,
         {
           role: "user",
-          content: message,
+          content: message.trim(),
         },
       ],
-      temperature: 0.25,
+      temperature: 0.1,
       max_tokens: 2400,
     });
 
     const answer = resposta.choices?.[0]?.message?.content || "";
+
+    if (!answer) {
+      return res.status(502).json({
+        error: "A IA não retornou uma resposta. Tente novamente.",
+      });
+    }
 
     res.json({
       answer,
@@ -412,16 +470,15 @@ app.post("/api/chat", async (req, res) => {
   } catch (error) {
     console.error("Erro na IA:", error);
 
-    res.status(500).json({
-      error: "Erro ao chamar a IA da NVIDIA.",
-      details: error.message,
+    res.status(error.status === 429 ? 429 : 502).json({
+      error:
+        error.status === 429
+          ? "Limite temporário da IA atingido. Tente novamente em instantes."
+          : "Não foi possível consultar a IA no momento. Tente novamente.",
     });
   }
 });
 
-const PORT = process.env.PORT || 3333;
-
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
-```

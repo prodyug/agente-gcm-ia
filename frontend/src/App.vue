@@ -61,6 +61,7 @@ const falando = ref(false);
 const ouvindo = ref(false);
 
 const ferramentaAtiva = ref(null);
+const menuMobileAberto = ref(false);
 
 const disciplinaSimulado = ref("Lei 13.022/2014");
 const quantidadeQuestoes = ref(5);
@@ -221,6 +222,7 @@ function criarSessao(titulo = "Nova conversa") {
 function selecionarSessao(id) {
   sessaoAtivaId.value = id;
   ferramentaAtiva.value = null;
+  menuMobileAberto.value = false;
   rolarChat();
 }
 
@@ -929,7 +931,6 @@ ${texto}`,
         <div>
           <span class="eyebrow dark">Agente de estudos</span>
 
-```
       <h1>Prepare seu concurso com estratégia</h1>
 
       <p>
@@ -1019,8 +1020,6 @@ ${texto}`,
     </small>
   </form>
 </section>
-```
-
   </main>
 
   <main v-else class="app">
@@ -1028,50 +1027,69 @@ ${texto}`,
       <div class="brand">
         <div class="brand-icon">A</div>
 
-```
     <div>
       <h1>Agente IA</h1>
       <p>Estudos para concurso</p>
     </div>
-  </div>
 
-  <button class="new-chat" @click="criarSessao()">
-    + Nova conversa
-  </button>
+      <button
+        class="mobile-menu-toggle"
+        type="button"
+        :aria-expanded="menuMobileAberto"
+        aria-controls="sidebar-content"
+        @click="menuMobileAberto = !menuMobileAberto"
+      >
+        {{ menuMobileAberto ? "Fechar" : "Menu" }}
+      </button>
+    </div>
 
-  <section class="profile-card">
+    <div
+      id="sidebar-content"
+      class="sidebar-content"
+      :class="{ open: menuMobileAberto }"
+    >
+      <button class="new-chat" @click="criarSessao(); menuMobileAberto = false">
+        + Nova conversa
+      </button>
+
+      <section class="profile-card">
     <span>Perfil ativo</span>
     <strong>{{ perfil.banca }}</strong>
     <p>{{ perfil.cargo }}</p>
     <small>{{ perfil.concurso }}</small>
-  </section>
+      </section>
 
-  <section class="sessions">
+      <section class="sessions">
     <div class="sessions-title">
       <span>Sessões</span>
     </div>
 
-    <button
+    <div
       v-for="sessao in sessoes"
       :key="sessao.id"
-      class="session-item"
-      :class="{ active: sessao.id === sessaoAtivaId }"
-      @click="selecionarSessao(sessao.id)"
+      class="session-row"
     >
-      <span>{{ sessao.title }}</span>
+      <button
+        class="session-item"
+        :class="{ active: sessao.id === sessaoAtivaId }"
+        @click="selecionarSessao(sessao.id)"
+      >
+        <span>{{ sessao.title }}</span>
+      </button>
 
       <button
         v-if="sessoes.length > 1"
         class="delete-session"
-        @click.stop="removerSessao(sessao.id)"
+        @click="removerSessao(sessao.id)"
+        :aria-label="`Excluir sessão ${sessao.title}`"
         title="Excluir sessão"
       >
         ×
       </button>
-    </button>
-  </section>
+    </div>
+      </section>
 
-  <div class="sidebar-actions">
+      <div class="sidebar-actions">
     <button @click="falarUltimaResposta" :disabled="loading">
       🔊 Ler última
     </button>
@@ -1080,10 +1098,11 @@ ${texto}`,
       Limpar sessão
     </button>
 
-    <button class="logout" @click="sair">
-      Sair
-    </button>
-  </div>
+        <button class="logout" @click="sair">
+          Sair
+        </button>
+      </div>
+    </div>
 </aside>
 
 <section class="workspace" :class="{ 'has-tool': ferramentaAtiva }">
@@ -1323,10 +1342,9 @@ ${texto}`,
 2-C
 3-B
 4-D
-5-E"
+5-D"
 ></textarea>
 
-```
       <button
         class="wide-btn"
         @click="corrigirRespostas"
@@ -1436,8 +1454,6 @@ ${texto}`,
     </div>
   </aside>
 </section>
-```
-
   </main>
 </template>
 
@@ -1773,6 +1789,17 @@ textarea:focus {
   flex-direction: column;
 }
 
+.sidebar-content {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-toggle {
+  display: none;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -1884,13 +1911,12 @@ textarea:focus {
 }
 
 .session-item {
-  width: 100%;
+  min-width: 0;
+  flex: 1;
   min-height: 40px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
   padding: 10px;
   border: 1px solid transparent;
   border-radius: 12px;
@@ -1906,6 +1932,13 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.session-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
 .session-item:hover,
 .session-item.active {
   background: rgba(255, 250, 240, 0.08);
@@ -1913,6 +1946,7 @@ textarea:focus {
 }
 
 .delete-session {
+  flex: 0 0 auto;
   width: 24px;
   height: 24px;
   border: none;
@@ -2896,6 +2930,125 @@ textarea:focus {
 
   .flip-face h4 {
     font-size: 21px;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    min-height: 100dvh;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .app {
+    display: block;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    min-height: 0;
+    padding: 10px 12px;
+    box-shadow: 0 8px 22px rgba(18, 21, 16, 0.18);
+  }
+
+  .brand {
+    justify-content: space-between;
+    padding: 0;
+    border: 0;
+  }
+
+  .mobile-menu-toggle {
+    min-height: 40px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(255, 250, 240, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 250, 240, 0.08);
+    color: #fffaf0;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .sidebar-content {
+    display: none;
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+  }
+
+  .sidebar-content.open {
+    display: flex;
+  }
+
+  .sidebar-actions {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .workspace,
+  .workspace.has-tool {
+    min-height: calc(100dvh - 64px);
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .tools-row {
+    gap: 10px;
+    padding: 2px 0 6px;
+    scroll-padding-inline: 2px;
+  }
+
+  .tools-row button {
+    min-width: max-content;
+    min-height: 44px;
+  }
+
+  .tool-card {
+    order: 2;
+    max-height: none;
+  }
+
+  .chat-panel {
+    order: 3;
+    min-height: min(620px, calc(100dvh - 186px));
+  }
+
+  .quick-badges {
+    scroll-padding-inline: 10px;
+  }
+
+  .composer {
+    grid-template-columns: 46px minmax(0, 1fr) 78px;
+    align-items: end;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .composer textarea {
+    min-height: 52px;
+    max-height: 120px;
+    padding: 14px 12px;
+  }
+
+  .composer button,
+  .mic-btn {
+    width: auto;
+    min-height: 52px;
+  }
+
+  .welcome-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-actions button {
+    width: 100%;
+    min-height: 46px;
   }
 }
 </style>
